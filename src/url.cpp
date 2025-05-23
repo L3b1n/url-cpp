@@ -270,31 +270,32 @@ namespace Url
         {
             path_.assign(url, position, std::string::npos);
 
-            index = path_.find('#');
-            if (index != std::string::npos)
-            {
-                fragment_.assign(path_, index + 1, std::string::npos);
-                path_.resize(index);
-            }
+            // Hack to work with file:///
+            // index = path_.find('#');
+            // if (index != std::string::npos)
+            // {
+            //     fragment_.assign(path_, index + 1, std::string::npos);
+            //     path_.resize(index);
+            // }
 
-            index = path_.find('?');
-            if (index != std::string::npos)
-            {
-                query_.assign(path_, index + 1, std::string::npos);
-                has_query_ = true;
-                path_.resize(index);
-            }
+            // index = path_.find('?');
+            // if (index != std::string::npos)
+            // {
+            //     query_.assign(path_, index + 1, std::string::npos);
+            //     has_query_ = true;
+            //     path_.resize(index);
+            // }
 
-            if (USES_PARAMS.find(scheme_) != USES_PARAMS.end())
-            {
-                index = path_.find(';');
-                if (index != std::string::npos)
-                {
-                    params_.assign(path_, index + 1, std::string::npos);
-                    has_params_ = true;
-                    path_.resize(index);
-                }
-            }
+            // if (USES_PARAMS.find(scheme_) != USES_PARAMS.end())
+            // {
+            //     index = path_.find(';');
+            //     if (index != std::string::npos)
+            //     {
+            //         params_.assign(path_, index + 1, std::string::npos);
+            //         has_params_ = true;
+            //         path_.resize(index);
+            //     }
+            // }
         }
     }
 
