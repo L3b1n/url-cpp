@@ -48,6 +48,7 @@ namespace Url
     struct Url
     {
         /* Character classes */
+        const static CharacterClass WINOS_INVALID;
         const static CharacterClass GEN_DELIMS;
         const static CharacterClass SUB_DELIMS;
         const static CharacterClass ALPHA;
@@ -83,7 +84,8 @@ namespace Url
             , fragment_(other.fragment_)
             , userinfo_(other.userinfo_)
             , has_params_(other.has_params_)
-            , has_query_(other.has_query_) { }
+            , has_query_(other.has_query_)
+			, win_os_(other.win_os_) { }
 
         /**
          * Take on the value of the other URL.
@@ -308,6 +310,7 @@ namespace Url
 
         std::string scheme_;
         std::string host_;
+		std::string win_os_;
         int port_;
         std::string path_;
         std::string params_;

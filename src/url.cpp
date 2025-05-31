@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstring>
 #include <string>
 #include <iterator>
 #include <unordered_map>
@@ -14,6 +15,7 @@ namespace Url
 {
 
     /* Character classes */
+	const CharacterClass Url::WINOS_INVALID("<>:\"/|?*");
     const CharacterClass Url::GEN_DELIMS(":/?#[]@");
     const CharacterClass Url::SUB_DELIMS("!$&'()*+,;=");
     const CharacterClass Url::DIGIT("0123456789");
@@ -199,6 +201,17 @@ namespace Url
             }
         }
 
+		// Hack to work without file:/// on windows
+		if (static_cast<int>(url.length() - position) >= 2 &&
+			url[position] == '/' &&
+			!WINOS_INVALID(url[position + 1]))
+		{
+			win_os_ = scheme_;
+			scheme_.clear();
+			path_ = url;
+			return;
+		}
+
         // Search for the netloc
         if ((url.length() - position) >= 1
             && url[position] == '/'
@@ -266,11 +279,25 @@ namespace Url
             }
         }
 
+		// Hack to work with file:/// on windows
+		if (strncmp(scheme_.c_str(), "file", 4) == 0 &&
+			static_cast<int>(url.length() - position) >= 3 &&
+			url[position] == '/' &&
+			ALPHA(url[position + 1]) &&
+			url[position + 2] == ':')
+		{
+			win_os_ = url[position + 1];
+			std::transform(win_os_.begin(), win_os_.end(), win_os_.begin(), ::tolower);
+			position += 1;
+		}
+
         if (position != std::string::npos)
         {
             path_.assign(url, position, std::string::npos);
 
-            // Hack to work with file:///
+            // Hack:
+			// Disable URL fragments
+			// 
             // index = path_.find('#');
             // if (index != std::string::npos)
             // {
@@ -316,7 +343,8 @@ namespace Url
             (query_      == other.query_     ) &&
             (fragment_   == other.fragment_  ) &&
             (has_params_ == other.has_params_) &&
-            (has_query_  == other.has_query_ )
+            (has_query_  == other.has_query_ ) &&
+			(win_os_     == other.win_os_)
         );
     }
 
@@ -410,7 +438,11 @@ namespace Url
             }
             else
             {
-                result.append("://");
+				if (win_os_.empty())
+					result.append("://");
+				else
+					result.append(":///");
+
             }
         }
         else if (!host_.empty())
